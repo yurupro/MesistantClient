@@ -1,2 +1,2 @@
 # MesistantClient
-Mesistant's Client
+Mesistantのクライアント
