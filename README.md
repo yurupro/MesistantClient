@@ -1,2 +1,4 @@
 # MesistantClient
 Mesistantのクライアント
+
+実装は後ほど変える可能性はあるけど、WebhookでPush実装
