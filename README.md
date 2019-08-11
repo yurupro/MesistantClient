@@ -1,4 +1,5 @@
-# MesistantClient
-Mesistantのクライアント
+# MesistantDevice
+Mesistantのデバイス側プログラム
 
-実装は後ほど変える可能性はあるけど、WebhookでPush実装
+## データの取得方法
+一定間隔でサーバから送られたリクエストがあるかどうかを調べる。
