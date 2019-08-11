@@ -14,7 +14,7 @@ class Task:
             lock = False
 
     def exec(self):
-        step = self.json['stpes'][now]
+        step = self.json['steps'][now]
 
         # TTSで読み上げ処理
 
