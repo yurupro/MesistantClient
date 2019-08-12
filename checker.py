@@ -26,13 +26,15 @@ while True:
     req = request.Request(url, json.dumps(data).encode(), headers)
     with request.urlopen(req) as res:
         body = json.loads(res.read().decode('utf8'))
+
+    # 認証失敗またはリクエストなし
     if body == None:
         continue
 
     if p != None:
         p.terminate()
     task = Task(body)
-    p = Process(target=task.exec())
+    p = Process(target=task.execute())
     p.start()
     
     time.sleep(1)
