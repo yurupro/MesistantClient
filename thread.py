@@ -1,3 +1,7 @@
+from tools import getTemp, getWeight, TTS, sevenSeg  
+import time
+import threading
+
 class Task:
     json = {}
     now = 0
@@ -7,32 +11,53 @@ class Task:
         self.json = json
 
     def next(self):
-        if lock == False:
+        if self.lock == False:
             self.now = self.now + 1
         else:
             # 強制履行の警告
-            lock = False
+            TTS('ボタンをもう一回押すと次のステージに移動します')
+            self.lock = False
 
     def excute(self):
-        step = self.json['steps'][now]
+        while self.json['steps'][self.now] != None:
+            step = self.json['steps'][self.now]
+            
+            # TTSで読み上げ処理
+            TTS(step['description'])
+            self.lock = True
 
-        # TTSで読み上げ処理
-        TTS(step['description'])
-        lock = True
-        if step['type'] == 'heat':
-            # 加熱処理
-            start = time.time()
-            while time.time() - start < step['duration']:
-                temp = getTemp()
-                if step['heat_strength'] + 5 < temp:
-                    setPower(False)
-                elif step['heat_strength'] - 5 > temp:
+            if step['type'] == 'heat':
+                # 加熱処理
+                start = time.time()
+                while time.time() - start < step['duration']:
+                    if now != self.now:
+                        break
+                    temp = getTemp()
+                    if step['heat_strength'] + 5 < temp:
+                        setPower(False)
+                    elif step['heat_strength'] - 5 > temp:
+                        setPower(True)
                     setPower(True)
+                    time.sleep(0.1)
+                setPower(False)
+                self.lock = False
+            else:
+                # 追加処理
+                while True:
+                    start = time.time()
+                    if now != self.now:
+                        break
 
-                setPower(True)
-
-            lock = False
-        else:
-            # 追加処理
-            # 重量を測って所定の重量になるまで
-            lock = False
+                    weight = getWeight()
+                    sevenSeg(weight)
+                    if step['add_grams'] - 10 < weight and step['add_grams'] + 10 > weight:
+                        self.lock = False
+                    else:
+                        if start % 15 == 0:
+                            if step['add_gram'] > weight:
+                                TTS('あと{}グラムを入れてください'.format(step['add_grams'] - weight))
+                            else:
+                                TTS('あと{}グラムを抜いてください'.format(weight - step['add_grams']))
+                        self.lock = True
+                    time.sleep(0.1)
+            self.now = self.now + 1
