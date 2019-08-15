@@ -6,14 +6,14 @@ from multiprocessing import Process
 
 config = ConfigParser.ConfigParser()
 config.read('settings.ini')
-if config.has_section('url') and config.has_section('token') == False:
+if config.has_section('url') and config.has_section('authentication') == False:
     print('Setting Parameters are not defined!')
     exit(1)
 
-url = config.get('url', 'url')
+url = config.get('url', 'fetch')
 
 data = {
-    'token': config.get('token', 'token')
+    'token': config.get('authentication', 'token')
 }
 
 headers = {
