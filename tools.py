@@ -16,6 +16,10 @@ def getWeight():
 
 # 温度測定
 def getTemp():
+    bus = smbus.SMBus(1)
+    address_adt7410 = 0x5a
+    register_adt7410 = 0x00
+
     word_data = bus.read_word_data(address_adt7410, register_adt7410)
     data = (word_data & 0xff00) >> 8 | (world_data & 0xff) << 8
     data = data >> 3
