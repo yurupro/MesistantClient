@@ -3,7 +3,6 @@ import smbus
 import RPi.GPIO as GPIO
 from hx711 import HX711
 import os
-import google.cloud import speech
 from pydub import AudioSegment
 
 class Tools:
