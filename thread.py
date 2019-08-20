@@ -52,5 +52,5 @@ class Task:
                     time.sleep(0.1)
 
             self.now = self.now + 1
-
+        self.isContinue = True
         self.tools.TTS('料理が出来上がりました！')
