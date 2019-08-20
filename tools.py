@@ -43,7 +43,7 @@ class Tools:
         googleTranslateURL = "http://translate.google.com/translate_tts?tl=en&"
         parameters = {'q': string}
         data = urllib.parse.urlencode(parameters)
-        googleTranslateURL = "%s%s" % (googleTranslateURL,data)
+        url = "%s%s" % (googleTranslateURL,data)
         
         fp = open(self.AUDIO_PATH, "wb")
         curl = pycurl.Curl()
