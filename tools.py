@@ -72,7 +72,7 @@ class Tools:
         
     # 重さ測定
     def getWeight(self):
-        return self.hx.get_weight(5)
+        return self.hx.get_weight(5) / 100
 
     # 温度測定
     def getTemp(self):
