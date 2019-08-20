@@ -9,7 +9,7 @@ class Task:
         self.json = json
         self.tools = tools
 
-    def excute(self):
+    def execute(self):
         while self.json['steps'][self.now] != None:
             step = self.json['steps'][self.now]
             
