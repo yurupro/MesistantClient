@@ -20,8 +20,6 @@ class Task:
                 # 加熱処理
                 start = time.time()
                 while time.time() - start < step['duration'] and self.isContinue:
-                    if now != self.now:
-                        break
                     temp = self.tools.getTemp()
                     if step['heat_strength'] + 5 < temp:
                         self.tools.setPower(False)
@@ -38,8 +36,6 @@ class Task:
                 weight_zero = self.tools.getWeight()
                 while self.isContinue:
                     start = time.time()
-                    if now != self.now:
-                        break
 
                     weight = self.tools.getWeight() - weight_zero
                     if step['add_grams'] - 10 < weight and step['add_grams'] + 10 > weight:
@@ -56,3 +52,5 @@ class Task:
                     time.sleep(0.1)
 
             self.now = self.now + 1
+
+        self.tools.TTS('料理が出来上がりました！')
