@@ -1,5 +1,6 @@
 import serial
 import smbus
+import RPi.GPIO as GPIO
 
 # 7Segmentに出力
 def sevenSeg(number):
@@ -23,8 +24,16 @@ def getTemp():
     Otemp1 = i2c.read_i2c_block_data(addr,0x7,3)
     AmbientTemp = ((Atemp[1]*256 + Atemp[0]) *0.02 -273.15)
     ObjectTemp1 = ((Otemp1[1]*256 + Otemp1[0]) *0.02 -273.15)
-    return ObjectTemp1
+    return round(ObjectTemp1,2)
 
 # 電源の設定(ON, OFF)
 def setPower(isOn):
-    pass
+    RELAY_PIN = 17
+
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(RELAY_PIN, GPIO.OUT)
+
+    if isOn:
+        GPIO.output(RELAY_PIN, GPIO.HIGH)
+    else:
+        GPIO.output(RELAY_PIN, GPIO.LOW)
