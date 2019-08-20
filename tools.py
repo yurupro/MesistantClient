@@ -40,6 +40,7 @@ class Tools:
 
     # 読みあげ
     def TTS(self, string):
+        print("Say: " + string)
         googleTranslateURL = "http://translate.google.com/translate_tts?tl=ja&"
         parameters = {'q': string}
         data = urllib.parse.urlencode(parameters)
