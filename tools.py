@@ -3,7 +3,6 @@ import smbus
 import RPi.GPIO as GPIO
 from hx711 import HX711
 import os
-from pydub import AudioSegment
 import urllib, pycurl
 
 class Tools:
