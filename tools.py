@@ -42,7 +42,7 @@ class Tools:
     def TTS(self, string):
         googleTranslateURL = "http://translate.google.com/translate_tts?tl=en&"
         parameters = {'q': string}
-        data = urllib.urlencode(parameters)
+        data = urllib.parse.urlencode(parameters)
         googleTranslateURL = "%s%s" % (googleTranslateURL,data)
         
         fp = open(self.AUDIO_PATH, "wb")
