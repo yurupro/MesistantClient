@@ -31,6 +31,10 @@ class Task:
                     setPower(True)
                     time.sleep(0.1)
                 setPower(False)
+                
+                # Nextを押すまでに待機
+                while self.isContinue:
+                time.sleep(0.1)
             else:
                 # 追加処理
                 while self.isContinue:
@@ -50,8 +54,4 @@ class Task:
                                 TTS('あと{}グラムを抜いてください'.format(weight - step['add_grams']))
                     time.sleep(0.1)
             
-            # Nextを押すまでに待機
-            while self.isContinue:
-                time.sleep(0.1)
-
             self.now = self.now + 1
