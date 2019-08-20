@@ -2,8 +2,10 @@ import serial
 import smbus
 import RPi.GPIO as GPIO
 from hx711 import HX711
+import configparser
 import os
 import urllib, pycurl
+import base64, json, requests
 
 class Tools:
     RELAY_PIN = 17
@@ -40,21 +42,33 @@ class Tools:
 
     # 読みあげ
     def TTS(self, string):
+        config = configparser.ConfigParser()
+        config.read('settings.ini')
+        key = config.get('authenticate', 'tts_key')
+        url = "https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=" + key
         print("Say: " + string)
-        googleTranslateURL = "http://translate.google.com/translate_tts?tl=ja&"
-        parameters = {'q': string}
-        data = urllib.parse.urlencode(parameters)
-        url = "%s%s" % (googleTranslateURL,data)
-        
-        fp = open(self.AUDIO_PATH, "wb")
-        curl = pycurl.Curl()
-        curl.setopt(pycurl.URL, url)
-        curl.setopt(pycurl.WRITEDATA, fp)
-        curl.perform()
-        curl.close()
-        fp.close()
+        str_json_data = {
+                'input': {
+                    'text': string
+                    },
+                'voice': {
+                    'languageCode': 'ja-JP',
+                    'name': 'ja-JP-Wavenet-A',
+                    'ssmlGender': 'FEMALE'
+                    },
+                'audioConfig': {
+                    'audioEncoding': 'MP3'
+                    }
+                }
+        jd = json.dumps(str_json_data)
 
-        os.system("mplayer tmp.mp3 -af extrastereo=0 &")
+
+        r = requests.post(url, data=jd, headers={'Content-type': 'application/json'})
+        if r.status_code == 200:
+            parsedBody = json.loads(r.text)
+            with open(self.AUDIO_PATH, "wb") as outmp3:
+                outmp3.write(base64.b64decode(parsedBody['audioContent']))
+        os.system("mpg123 tmp.mp3 &")
         
     # 重さ測定
     def getWeight(self):
