@@ -4,15 +4,12 @@ import RPi.GPIO as GPIO
 from hx711 import HX711
 import os
 from pydub import AudioSegment
+import urllib, pycurl
 
 class Tools:
     RELAY_PIN = 17
     BUTTON_PIN = 27
-    AUDIO_PATH = 'tmp/'
-
-    encoding = 'LINEAR16'
-    sample_rate = 1000
-    language_code = 'ja_JP'
+    AUDIO_PATH = 'tmp.mp3'
 
     def __init__(self, callback):
         # Callback設定
@@ -44,7 +41,20 @@ class Tools:
 
     # 読みあげ
     def TTS(self, string):
-        pass
+        googleTranslateURL = "http://translate.google.com/translate_tts?tl=en&"
+        parameters = {'q': string}
+        data = urllib.urlencode(parameters)
+        googleTranslateURL = "%s%s" % (googleTranslateURL,data)
+        
+        fp = open(self.AUDIO_PATH, "wb")
+        curl = pycurl.Curl()
+        curl.setopt(pycurl.URL, url)
+        curl.setopt(pycurl.WRITEDATA, fp)
+        curl.perform()
+        curl.close()
+        fp.close()
+
+        os.system("mplayer tmp.mp3 -af extrastereo=0 &")
         
     # 重さ測定
     def getWeight(self):
