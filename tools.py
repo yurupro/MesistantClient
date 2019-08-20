@@ -11,7 +11,7 @@ class Tools:
         self.callback = callback
         
         self.referenceUnit = 1
-        self.self.hx = HX711(5, 6)
+        self.hx = HX711(5, 6)
         self.hx.set_reading_format("MSB", "MSB")
         self.hx.set_reference_unit(referenceUnit)
         self.hx.reset()

@@ -19,6 +19,10 @@ url = config.get('url', 'fetch').format(config.get('authentication', 'device_id'
 p = None
 task = None
 
+def nextButton(channel):
+    if task != None:
+        task.isContinue = False
+
 while True:
     req = request.Request(url)
     with request.urlopen(req) as res:
@@ -36,6 +40,3 @@ while True:
     p.start()
     p.join()
 
-def nextButton(channel):
-    if task != None:
-        task.isContinue = False
