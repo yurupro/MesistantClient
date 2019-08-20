@@ -2,10 +2,18 @@ import serial
 import smbus
 import RPi.GPIO as GPIO
 from hx711 import HX711
+import os
+import google.cloud import speech
+from pydub import AudioSegment
 
 class Tools:
     RELAY_PIN = 17
     BUTTON_PIN = 27
+    AUDIO_PATH = 'tmp/'
+
+    encoding = 'LINEAR16'
+    sample_rate = 1000
+    language_code = 'ja_JP'
 
     def __init__(self, callback):
         # Callback設定
@@ -38,7 +46,7 @@ class Tools:
     # 読みあげ
     def TTS(self, string):
         pass
-
+        
     # 重さ測定
     def getWeight(self):
         return self.hx.get_weight(5)

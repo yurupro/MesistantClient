@@ -22,26 +22,27 @@ class Task:
                 while time.time() - start < step['duration'] and self.isContinue:
                     if now != self.now:
                         break
-                    temp = tools.getTemp()
+                    temp = self.tools.getTemp()
                     if step['heat_strength'] + 5 < temp:
-                        tools.setPower(False)
+                        self.tools.setPower(False)
                     elif step['heat_strength'] - 5 > temp:
-                        tools.setPower(True)
-                    tools.setPower(True)
+                        self.tools.setPower(True)
+                    self.tools.setPower(True)
                     time.sleep(0.1)
-                tools.setPower(False)
+                self.tools.setPower(False)
                 
                 # Nextを押すまでに待機
                 while self.isContinue:
                     time.sleep(0.1)
             else:
                 # 追加処理
+                weight_zero = self.tools.getWeight()
                 while self.isContinue:
                     start = time.time()
                     if now != self.now:
                         break
 
-                    weight = self.getWeight()
+                    weight = self.tools.getWeight() - weight_zero
                     if step['add_grams'] - 10 < weight and step['add_grams'] + 10 > weight:
                         tools.TTS('適量です'.format(step['add_grams'] - weight))
                     else:
