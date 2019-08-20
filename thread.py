@@ -18,7 +18,7 @@ class Task:
 
             if step['type'] == 'heat':
                 # 加熱処理
-                while self.tools.getTemp() >= step['heat_strength']-5:
+                while self.tools.getTemp() <= step['heat_strength']-5:
                     self.tools.setPower(True)
 
                 # 温度維持
