@@ -14,9 +14,10 @@ def TTS(string):
 
 # 重さ測定
 def getWeight():
+    referenceUnit = 1
     hx = HX711(5, 6)
     hx.set_reading_format("MSB", "MSB")
-    hx.set_reading_unit(referenceUnit)
+    hx.set_reference_unit(referenceUnit)
     hx.reset()
     hx.tare()
 
