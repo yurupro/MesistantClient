@@ -21,7 +21,7 @@ def getTemp():
     register_adt7410 = 0x00
 
     word_data = bus.read_word_data(address_adt7410, register_adt7410)
-    data = (word_data & 0xff00) >> 8 | (world_data & 0xff) << 8
+    data = (word_data & 0xff00) >> 8 | (word_data & 0xff) << 8
     data = data >> 3
     if data & 0x1000 == 0:
         return data * 0.0625
