@@ -8,23 +8,27 @@ class Tools:
     BUTTON_PIN = 27
 
     def __init__(self, callback):
+        # Callback設定
         self.callback = callback
-        
+       
+        # HX711設定
         self.referenceUnit = 1
         self.hx = HX711(5, 6)
         self.hx.set_reading_format("MSB", "MSB")
-        self.hx.set_reference_unit(referenceUnit)
+        self.hx.set_reference_unit(self.referenceUnit)
         self.hx.reset()
         self.hx.tare()
 
+        # 温度センサー
         self.i2c = smbus.SMBus(1)
         self.i2caddr=0x5a
-        
+       
+        # GPIO設定
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(BUTTON_PIN, GPIO.IN)
-        GPIO.add_event_detect(BUTTON_PIN, GPIO.FALLING, callback=self.callback, bouncetime=300)
-        GPIO.setup(RELAY_PIN, GPIO.OUT)
+        GPIO.setup(self.BUTTON_PIN, GPIO.IN)
+        GPIO.add_event_detect(self.BUTTON_PIN, GPIO.FALLING, callback=self.callback, bouncetime=300)
+        GPIO.setup(self.RELAY_PIN, GPIO.OUT)
 
     # 7Segmentに出力
     def sevenSeg(self, number):
