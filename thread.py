@@ -1,63 +1,56 @@
-from tools import getTemp, getWeight, TTS, sevenSeg  
 import time
 import threading
 
 class Task:
-    json = {}
     now = 0
-    lock = False
-
-    def __init__(self, json):
+    isContinue = True
+    
+    def __init__(self, json, tools):
         self.json = json
+        self.tools = tools
 
-    def next(self):
-        if self.lock == False:
-            self.now = self.now + 1
-        else:
-            # 強制履行の警告
-            TTS('ボタンをもう一回押すと次のステージに移動します')
-            self.lock = False
-
-    def excute(self):
+    def execute(self):
         while self.json['steps'][self.now] != None:
             step = self.json['steps'][self.now]
             
             # TTSで読み上げ処理
-            TTS(step['description'])
-            self.lock = True
+            self.tools.TTS(step['description'])
 
             if step['type'] == 'heat':
                 # 加熱処理
                 start = time.time()
-                while time.time() - start < step['duration']:
-                    if now != self.now:
-                        break
-                    temp = getTemp()
+                while time.time() - start < step['duration'] and self.isContinue:
+                    temp = self.tools.getTemp()
                     if step['heat_strength'] + 5 < temp:
-                        setPower(False)
+                        self.tools.setPower(False)
                     elif step['heat_strength'] - 5 > temp:
-                        setPower(True)
-                    setPower(True)
+                        self.tools.setPower(True)
                     time.sleep(0.1)
-                setPower(False)
-                self.lock = False
-            else:
+                self.tools.setPower(False)
+                
+                # Nextを押すまでに待機
+                while self.isContinue:
+                    time.sleep(0.1)
+            elif step['type'] == 'add':
                 # 追加処理
-                while True:
+                weight_zero = self.tools.getWeight()
+                while self.isContinue:
                     start = time.time()
-                    if now != self.now:
-                        break
 
-                    weight = getWeight()
-                    sevenSeg(weight)
+                    weight = self.tools.getWeight() - weight_zero
                     if step['add_grams'] - 10 < weight and step['add_grams'] + 10 > weight:
-                        self.lock = False
+                        self.tools.TTS('適量です'.format(step['add_grams'] - weight))
                     else:
                         if start % 15 == 0:
                             if step['add_gram'] > weight:
-                                TTS('あと{}グラムを入れてください'.format(step['add_grams'] - weight))
+                                self.tools.TTS('あと{}グラムを入れてください'.format(step['add_grams'] - weight))
                             else:
-                                TTS('あと{}グラムを抜いてください'.format(weight - step['add_grams']))
-                        self.lock = True
+                                self.tools.TTS('あと{}グラムを抜いてください'.format(weight - step['add_grams']))
                     time.sleep(0.1)
+            else:
+                while self.isContinue:
+                    time.sleep(0.1)
+
             self.now = self.now + 1
+        self.isContinue = True
+        self.tools.TTS('料理が出来上がりました！')
