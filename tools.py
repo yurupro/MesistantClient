@@ -44,7 +44,7 @@ class Tools:
     def TTS(self, string):
         config = configparser.ConfigParser()
         config.read('settings.ini')
-        key = config.get('authenticate', 'tts_key')
+        key = config.get('authentication', 'tts_key')
         url = "https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=" + key
         print("Say: " + string)
         str_json_data = {
