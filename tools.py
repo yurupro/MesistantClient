@@ -1,6 +1,7 @@
 import serial
 import smbus
 import RPi.GPIO as GPIO
+from hx711 import HX711
 
 # 7Segmentに出力
 def sevenSeg(number):
@@ -13,7 +14,13 @@ def TTS(string):
 
 # 重さ測定
 def getWeight():
-    pass
+    hx = HX711(5, 6)
+    hx.set_reading_format("MSB", "MSB")
+    hx.set_reading_unit(referenceUnit)
+    hx.reset()
+    hx.tare()
+
+    return hx.get_weight(5)
 
 # 温度測定
 def getTemp():
