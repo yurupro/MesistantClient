@@ -3,7 +3,7 @@ import smbus
 
 # 7Segmentに出力
 def sevenSeg(number):
-    s = serial.Serial(''. 9600)
+    s = serial.Serial('', 9600)
     s.write(str(number))
 
 # 読みあげ
