@@ -32,9 +32,6 @@ class Task:
                     time.sleep(0.1)
                 self.tools.setPower(False)
                 
-                # Nextを押すまでに待機
-                while self.isContinue:
-                    time.sleep(0.1)
             elif step['type'] == 'add':
                 # 追加処理
                 weight_zero = self.tools.getWeight()
