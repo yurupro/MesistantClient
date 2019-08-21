@@ -10,7 +10,11 @@ class Task:
         self.tools = tools
 
     def execute(self):
-        while self.json['steps'][self.now] != None:
+        self.tools.setPower(True)
+        time.sleep(2)
+        self.tools.setPower(False)
+        while len(self.json['steps']) > self.now :
+            print("Step"+str(self.now)+" Length: "+ str(len(self.json['steps'])))
             step = self.json['steps'][self.now]
             
             # TTSで読み上げ処理
@@ -19,11 +23,13 @@ class Task:
             if step['type'] == 'heat':
                 # 加熱処理
                 while self.tools.getTemp() <= step['heat_strength']-5:
+                    print(self.tools.getTemp())
                     self.tools.setPower(True)
 
                 # 温度維持
                 start = time.time()
                 while time.time() - start < step['duration'] and self.isContinue:
+                    print(self.tools.getTemp())
                     temp = self.tools.getTemp()
                     if step['heat_strength'] + 5 < temp:
                         self.tools.setPower(False)
@@ -36,11 +42,13 @@ class Task:
                 # 追加処理
                 weight_zero = self.tools.getWeight()
                 while self.isContinue:
+                    print(self.tools.getWeight())
                     start = time.time()
 
                     weight = self.tools.getWeight() - weight_zero
                     if step['add_grams'] - 10 < weight and step['add_grams'] + 10 > weight:
                         self.tools.TTS('適量です'.format(step['add_grams'] - weight))
+                        break
                     else:
                         if start % 15 == 0:
                             if step['add_gram'] > weight:
