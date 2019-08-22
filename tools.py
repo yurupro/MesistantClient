@@ -36,6 +36,8 @@ class Tools:
         GPIO.add_event_detect(self.BUTTON_PIN, GPIO.FALLING, callback=self.callback, bouncetime=300)
         GPIO.setup(self.RELAY_PIN, GPIO.OUT)
 
+    def isButton(self):
+        return GPIO.input(self.BUTTON_PIN)
     # 7Segmentに出力
     def sevenSeg(self, number):
         s = serial.Serial('', 9600)

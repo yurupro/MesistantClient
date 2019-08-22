@@ -2,7 +2,66 @@ import time
 import threading
 import math
 
-class Task:
+
+def Record(tools):
+    count = 0
+    json = {}
+    json["steps"] = []
+
+    def recordTemp():
+        print("温度を記録")
+        tools.TTS("加熱処理を記録します")
+        while True:
+            print("温度変化: {}".format(tools.getTemp() - zero_temp))
+            if tools.isButton():
+                json["steps"].append({
+                    "type": "heat",
+                    "description": "加熱する",
+                    "heat_strength": math.floor(tools.getTemp()),
+                    })
+                tools.TTS("加熱処理を完了します。")
+                print(json)
+                break
+            time.sleep(1)
+        time.sleep(4)
+    def recordWeight(): 
+        print("重量を記録")
+        tools.TTS("追加処理を記録します")
+        while True:
+            print("重量変化: {}".format(tools.getWeight()))
+            if tools.isButton():
+                json["steps"].append({
+                    "type": "add",
+                    "description": "追加する",
+                    "heat_strength": math.floor(tools.getWeight()),
+                    })
+                tools.TTS("追加処理を完了します。")
+                print(json)
+                break
+            time.sleep(1)
+        time.sleep(4)
+    while True:
+        tools.TTS("作業を開始してください。")
+        start = time.time()
+        zero_temp = tools.getTemp()
+        tools.tareWeight()
+        while True:
+            print("温度変化: {}".format(tools.getTemp() - zero_temp))
+            print("重量変化: {}".format(tools.getWeight()))
+            if tools.getTemp() - zero_temp > 10:
+                recordTemp()
+
+            elif tools.getWeight() > 50:
+                recordWeight()
+            elif tools.isButton():
+                tools.TTS("記録を終了します。")
+                print(json)
+                return json
+            time.sleep(1)
+            
+
+class UploadTask:
+    recipe = {}
     now = 0
     isContinue = True
     
@@ -11,7 +70,6 @@ class Task:
         self.tools = tools
 
     def execute(self):
-        self.tools.setPower(False)
         while len(self.json['steps']) > self.now :
             print("Step"+str(self.now)+" Length: "+ str(len(self.json['steps'])))
             step = self.json['steps'][self.now]
@@ -37,10 +95,6 @@ class Task:
                 # 温度維持
                 self.tools.TTS("{}秒間この温度を維持します。".format(step['duration']))
                 start = time.time()
-                print("----")
-                print(time.time() - start)
-                self.isContinue = True
-                print(self.isContinue)
                 while time.time() - start < step['duration'] and self.isContinue:
                     print(self.tools.getTemp())
                     temp = self.tools.getTemp()
@@ -65,8 +119,6 @@ class Task:
                 self.tools.TTS(step['description'])
                 time.sleep(5)
 
-                self.isContinue = True
-                print(self.isContinue)
                 while self.isContinue:
                     print("--")
 
@@ -86,78 +138,10 @@ class Task:
                     count += 1
                     time.sleep(1)
             else:
-                self.tools.TTS(step['description'])
-                time.sleep(4)
-                self.tools.TTS('完了しましたらボタンを押してください。')
-                self.isContinue = True
-                print(self.isContinue)
                 while self.isContinue:
                     time.sleep(0.1)
 
             time.sleep(2)
             self.now = self.now + 1
+        self.isContinue = True
         self.tools.TTS('料理が出来上がりました！')
-        
-
-
-
-
-
-
-    def record(self):
-        count = 0
-        self.json = {}
-        self.json["steps"] = []
-
-        def recordTemp():
-            print("温度を記録")
-            self.tools.TTS("加熱処理を記録します")
-            while True:
-                print("温度変化: {}".format(self.tools.getTemp() - zero_temp))
-                if self.tools.isButton():
-                    self.json["steps"].append({
-                        "type": "heat",
-                        "description": "加熱する",
-                        "heat_strength": math.floor(self.tools.getTemp()),
-                        })
-                    self.tools.TTS("加熱処理を完了します。")
-                    zero_temp = self.tools.getTemp()
-                    print(json)
-                    break
-                time.sleep(1)
-            time.sleep(4)
-        def recordWeight(): 
-            print("重量を記録")
-            self.tools.TTS("追加処理を記録します")
-            while True:
-                print("重量変化: {}".format(self.tools.getWeight()))
-                if self.tools.isButton():
-                    self.json["steps"].append({
-                        "type": "add",
-                        "description": "追加する",
-                        "add_grams": math.floor(self.tools.getWeight()),
-                        })
-                    self.tools.tareWeight()
-                    self.tools.TTS("追加処理を完了します。")
-                    print(self.json)
-                    break
-                time.sleep(1)
-            time.sleep(4)
-        while True:
-            self.tools.TTS("作業を開始してください。")
-            start = time.time()
-            zero_temp = self.tools.getTemp()
-            self.tools.tareWeight()
-            while True:
-                print("温度変化: {}".format(self.tools.getTemp() - zero_temp))
-                print("重量変化: {}".format(self.tools.getWeight()))
-                if self.tools.getTemp() - zero_temp > 10:
-                    recordTemp()
-
-                elif self.tools.getWeight() > 50:
-                    recordWeight()
-                elif self.tools.isButton():
-                    self.tools.TTS("記録を終了します。")
-                    print(self.json)
-                    return self.json
-                time.sleep(1)
