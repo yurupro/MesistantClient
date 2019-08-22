@@ -6,6 +6,7 @@ import configparser
 import os
 import urllib, pycurl
 import base64, json, requests
+import math
 
 class Tools:
     RELAY_PIN = 17
@@ -20,7 +21,7 @@ class Tools:
         self.referenceUnit = 1
         self.hx = HX711(5, 6)
         self.hx.set_reading_format("MSB", "MSB")
-        self.hx.set_reference_unit(self.referenceUnit)
+        self.hx.set_reference_unit(224)
         self.hx.reset()
         self.hx.tare()
 
@@ -72,7 +73,7 @@ class Tools:
         
     # 重さ測定
     def getWeight(self):
-        return self.hx.get_weight(5) / 100
+        return self.hx.get_weight(5)
 
     # 温度測定
     def getTemp(self):
