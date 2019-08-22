@@ -70,7 +70,13 @@ class Tools:
             with open(self.AUDIO_PATH, "wb") as outmp3:
                 outmp3.write(base64.b64decode(parsedBody['audioContent']))
         os.system("mpg123 tmp.mp3 &")
+    def beep(self):
+        os.system("mpg123 beep.mp3 &")
         
+    # 重さ風袋調整
+    def tareWeight(self):
+        self.hx.tare()
+
     # 重さ測定
     def getWeight(self):
         return self.hx.get_weight(5)

@@ -11,9 +11,6 @@ class Task:
         self.tools = tools
 
     def execute(self):
-        self.tools.setPower(True)
-        time.sleep(2)
-        self.tools.setPower(False)
         while len(self.json['steps']) > self.now :
             print("Step"+str(self.now)+" Length: "+ str(len(self.json['steps'])))
             step = self.json['steps'][self.now]
@@ -32,9 +29,9 @@ class Task:
                 while time.time() - start < step['duration'] and self.isContinue:
                     print(self.tools.getTemp())
                     temp = self.tools.getTemp()
-                    if step['heat_strength'] + 5 < temp:
+                    if step['heat_strength'] + 1 < temp:
                         self.tools.setPower(False)
-                    elif step['heat_strength'] - 5 > temp:
+                    elif step['heat_strength'] - 1 > temp:
                         self.tools.setPower(True)
                     time.sleep(0.1)
                 self.tools.setPower(False)
@@ -43,35 +40,24 @@ class Task:
                 # 追加処理
                 weight_previous = 0
                 count = 0
-                weight_zero = 0
                 self.tools.TTS("調整中です。デバイスを動かさないでください。")
-                while True:
-                    if abs(self.tools.getWeight() - weight_previous) < 15:
-                        self.tools.TTS("調整完了しました。")
-                        weight_zero = self.tools.getWeight()
-                        print("weight_zero: {}".format(weight_zero))
-                        break
-                    weight_previous = self.tools.getWeight()
-                    time.sleep(1)
+                time.sleep(3)
+                self.tools.beep()
+                self.tools.tareWeight()
                 self.tools.TTS(step['description'])
-                time.sleep(2)
+                time.sleep(3)
                 while self.isContinue:
                     print("--")
 
-                    weight = self.tools.getWeight() - weight_zero
-                    print("Zero: {}C".format(weight_zero))
+                    weight = self.tools.getWeight()
                     print("Now: {}C".format(weight))
                     print("Difer from previous: {}C".format(abs(weight - weight_previous)))
-                    if abs(weight - weight_previous) < 15:
+                    self.tools.TTS('{}グラム'.format(math.floor(weight)))
+                    if abs(weight - weight_previous) < 3:
                         if step['add_grams'] - 15 < weight and step['add_grams'] + 15 > weight:
                             self.tools.TTS('{}グラム。適量です。'.format(math.floor(step['add_grams'] - weight)))
+                            self.tools.beep()
                             break
-                        else:
-                            if count % 5 == 0:
-                                if step['add_grams'] > weight:
-                                    self.tools.TTS('あと{}グラムを入れてください'.format(math.floor(step['add_grams'] - weight)))
-                                else:
-                                    self.tools.TTS('あと{}グラムを抜いてください'.format(math.floor(weight - step['add_grams'])))
                     weight_previous = weight
                     count += 1
                     time.sleep(1)
@@ -79,6 +65,7 @@ class Task:
                 while self.isContinue:
                     time.sleep(0.1)
 
+            time.sleep(2)
             self.now = self.now + 1
         self.isContinue = True
         self.tools.TTS('料理が出来上がりました！')
