@@ -2,12 +2,17 @@ import serial
 import smbus
 import RPi.GPIO as GPIO
 from hx711 import HX711
+import configparser
 import os
 import urllib, pycurl
+import base64, json, requests
+import math
+import time
+from mutagen.mp3 import MP3 as mp3
 
 class Tools:
     RELAY_PIN = 17
-    BUTTON_PIN = 27
+    BUTTON_PIN = 26
     AUDIO_PATH = 'tmp.mp3'
 
     def __init__(self, callback):
@@ -18,7 +23,7 @@ class Tools:
         self.referenceUnit = 1
         self.hx = HX711(5, 6)
         self.hx.set_reading_format("MSB", "MSB")
-        self.hx.set_reference_unit(self.referenceUnit)
+        self.hx.set_reference_unit(224)
         self.hx.reset()
         self.hx.tare()
 
@@ -33,6 +38,8 @@ class Tools:
         GPIO.add_event_detect(self.BUTTON_PIN, GPIO.FALLING, callback=self.callback, bouncetime=300)
         GPIO.setup(self.RELAY_PIN, GPIO.OUT)
 
+    def isButton(self):
+        return GPIO.input(self.BUTTON_PIN)
     # 7Segmentに出力
     def sevenSeg(self, number):
         s = serial.Serial('', 9600)
@@ -40,21 +47,45 @@ class Tools:
 
     # 読みあげ
     def TTS(self, string):
-        googleTranslateURL = "http://translate.google.com/translate_tts?tl=ja&"
-        parameters = {'q': string}
-        data = urllib.parse.urlencode(parameters)
-        url = "%s%s" % (googleTranslateURL,data)
-        
-        fp = open(self.AUDIO_PATH, "wb")
-        curl = pycurl.Curl()
-        curl.setopt(pycurl.URL, url)
-        curl.setopt(pycurl.WRITEDATA, fp)
-        curl.perform()
-        curl.close()
-        fp.close()
+        config = configparser.ConfigParser()
+        config.read('settings.ini')
+        key = config.get('authentication', 'tts_key')
+        url = "https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=" + key
+        print("Say: " + string)
+        str_json_data = {
+                'input': {
+                    'text': string
+                    },
+                'voice': {
+                    'languageCode': 'ja-JP',
+                    'name': 'ja-JP-Wavenet-A',
+                    'ssmlGender': 'FEMALE'
+                    },
+                'audioConfig': {
+                    'audioEncoding': 'MP3'
+                    }
+                }
+        jd = json.dumps(str_json_data)
 
-        os.system("mplayer tmp.mp3 -af extrastereo=0 &")
+
+        r = requests.post(url, data=jd, headers={'Content-type': 'application/json'})
+        if r.status_code == 200:
+            parsedBody = json.loads(r.text)
+            with open(self.AUDIO_PATH, "wb") as outmp3:
+                outmp3.write(base64.b64decode(parsedBody['audioContent']))
+            mp3_length = mp3("tmp.mp3").info.length
+            os.system("mpg123 tmp.mp3 &")
+            time.sleep(mp3_length + 1)# 再生時間分sleep
+
+    def beep(self):
+        mp3_length = mp3("beep.mp3").info.length
+        os.system("mpg123 beep.mp3 &")
+        time.sleep(mp3_length + 1)# 再生時間分sleep
         
+    # 重さ風袋調整
+    def tareWeight(self):
+        self.hx.tare()
+
     # 重さ測定
     def getWeight(self):
         return self.hx.get_weight(5)
