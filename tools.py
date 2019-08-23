@@ -7,6 +7,8 @@ import os
 import urllib, pycurl
 import base64, json, requests
 import math
+import time
+from mutagen.mp3 import MP3 as mp3
 
 class Tools:
     RELAY_PIN = 17
@@ -71,9 +73,14 @@ class Tools:
             parsedBody = json.loads(r.text)
             with open(self.AUDIO_PATH, "wb") as outmp3:
                 outmp3.write(base64.b64decode(parsedBody['audioContent']))
-        os.system("mpg123 tmp.mp3 &")
+            mp3_length = mp3("tmp.mp3").info.length
+            os.system("mpg123 tmp.mp3 &")
+            time.sleep(mp3_length + 1)# 再生時間分sleep
+
     def beep(self):
+        mp3_length = mp3("beep.mp3").info.length
         os.system("mpg123 beep.mp3 &")
+        time.sleep(mp3_length + 1)# 再生時間分sleep
         
     # 重さ風袋調整
     def tareWeight(self):

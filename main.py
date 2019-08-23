@@ -25,14 +25,30 @@ def nextButton(channel):
         print("aaaaa")
         task.isContinue = False
 
+tools = Tools(nextButton) 
+tools.beep()
+time.sleep(1)
 while True:
-    tools = Tools(nextButton) 
-    print(tools.isButton())
     if tools.isButton() == 1:
         tools.TTS("レシピアップロードモードだお")
         task = Task({}, tools)
-        task.record()
-        print(json)
+        uploadJSON = task.record()
+
+        uploadUrl = config.get('url', 'upload')
+        userID = config.get('authentication', 'id')
+        uploadJSON['user_id'] = userID
+        uploadJSON['name'] = "デバイスからアップロードされたレシピ"
+        print(uploadJSON)
+        req = request.Request(
+            uploadUrl,
+            data=json.dumps(uploadJSON).encode(),
+            method="POST",
+            headers={'Content-type': 'application/json'}
+        )
+        with request.urlopen(req) as res:
+            print(res)
+            if res.getcode() == 200:
+                tools.TTS("アップロード完了")
         
     else:
         tools.TTS("レシピダウンロードモードだお")
