@@ -21,19 +21,8 @@ class Task:
                 count = 0
                 # TTSで読み上げ処理
                 self.tools.TTS(step['description'])
-                # 加熱処理
-                while self.tools.getTemp() <= step['heat_strength']-5:
-                    print(self.tools.getTemp())
-                    self.tools.setPower(True)
-                    if count % 15 == 0:
-                        self.tools.TTS("目標温度まで、あと{}℃".format(math.floor(step['heat_strength'] - 5 - self.tools.getTemp())))
-                    time.sleep(1)
-                    count += 1
-
-                self.tools.TTS("目標温度に到達しました。")
-
                 # 温度維持
-                self.tools.TTS("{}秒間この温度を維持します。".format(step['duration']))
+                self.tools.TTS("{}秒間熱します。".format(step['duration']))
                 start = time.time()
                 print("----")
                 print(time.time() - start)
@@ -46,19 +35,22 @@ class Task:
                         self.tools.setPower(False)
                     elif step['heat_strength'] - 1 > temp:
                         self.tools.setPower(True)
+                        time.sleep(0.1)
+                        self.isContinue = True
                     time.sleep(1)
                 self.tools.setPower(False)
+                time.sleep(0.1)
+                self.isContinue = True
                 
             elif step['type'] == 'add':
                 # 追加処理
-                weight_previous = 0
-                count = 0
-                self.tools.TTS("調整中です。デバイスを動かさないでください。")
-                self.tools.beep()
-                self.tools.tareWeight()
-
                 # TTSで読み上げ処理
                 self.tools.TTS(step['description'])
+
+                weight_previous = 0
+                count = 0
+                self.tools.beep()
+                self.tools.tareWeight()
 
                 self.isContinue = True
                 print(self.isContinue)
@@ -82,7 +74,6 @@ class Task:
                 self.tools.TTS(step['description'])
                 self.tools.TTS('完了しましたらボタンを押してください。')
                 self.isContinue = True
-                print(self.isContinue)
                 while self.isContinue:
                     time.sleep(0.1)
 

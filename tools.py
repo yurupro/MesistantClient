@@ -12,7 +12,7 @@ from mutagen.mp3 import MP3 as mp3
 
 class Tools:
     RELAY_PIN = 17
-    BUTTON_PIN = 27
+    BUTTON_PIN = 26
     AUDIO_PATH = 'tmp.mp3'
 
     def __init__(self, callback):

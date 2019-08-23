@@ -27,6 +27,7 @@ def nextButton(channel):
 
 tools = Tools(nextButton) 
 tools.beep()
+
 time.sleep(1)
 while True:
     if tools.isButton() == 1:
